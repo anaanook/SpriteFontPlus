@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Cyotek.Drawing.BitmapFont;
 using System.Linq;
 using System.Reflection;
 
@@ -8,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using StbImageSharp;
+using Cyotek.Drawing.BitmapFont;
 
 namespace SpriteFontPlus
 {
@@ -37,7 +37,6 @@ namespace SpriteFontPlus
 		private static SpriteFont Load(BitmapFont data, Texture2D texture)
 		{
 
-
 			var glyphBounds = new List<Rectangle>();
 			var cropping = new List<Rectangle>();
 			var chars = new List<char>();
@@ -65,14 +64,7 @@ namespace SpriteFontPlus
 		private static BitmapFont LoadBMFont(string data)
 		{
 			var bmFont = new BitmapFont();
-			if (data.StartsWith("<"))
-			{
-				bmFont.LoadXml(data);
-			}
-			else
-			{
-				bmFont.LoadText(data);
-			}
+			bmFont.LoadText(data);
 
 			return bmFont;
 		}
