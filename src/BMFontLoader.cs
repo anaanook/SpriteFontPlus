@@ -34,42 +34,32 @@ namespace SpriteFontPlus
 
 	public static class BMFontLoader
 	{
-		private static SpriteFont Load(BitmapFont data, Func<string, TextureWithOffset> textureGetter)
+		private static SpriteFont Load(BitmapFont data, Texture2D texture)
 		{
-			if (data.Pages.Length > 1)
-			{
-				throw new NotSupportedException("For now only BMFonts with single texture are supported");
-			}
 
-			var texture = textureGetter(data.Pages[0].FileName);
 
 			var glyphBounds = new List<Rectangle>();
 			var cropping = new List<Rectangle>();
 			var chars = new List<char>();
 			var kerning = new List<Vector3>();
+            
+            var characters = data.Characters.Values.ToList();
 
-			var characters = data.Characters.Values.OrderBy(c => c.Char);
-			foreach (var character in characters)
-			{
+            var length = characters.Count();
+
+            foreach(var character in characters) { 
 				var bounds = new Rectangle(character.X, character.Y, character.Width, character.Height);
-
-				bounds.Offset(texture.Offset);
+                
+				bounds.Offset(0,0);
 				glyphBounds.Add(bounds);
 				cropping.Add(new Rectangle(character.XOffset, character.YOffset, bounds.Width, bounds.Height));
-
+                
 				chars.Add(character.Char);
-
+                
 				kerning.Add(new Vector3(0, character.Width, character.XAdvance - character.Width));
 			}
-
-			var constructorInfo = typeof(SpriteFont).GetTypeInfo().DeclaredConstructors.First();
-			var result = (SpriteFont)constructorInfo.Invoke(new object[]
-			{
-				texture.Texture, glyphBounds, cropping,
-				chars, data.LineHeight, 0, kerning, ' '
-			});
-
-			return result;
+            
+			return new SpriteFont(texture,glyphBounds,cropping,chars,data.LineHeight,0,kerning,' ');
 		}
 
 		private static BitmapFont LoadBMFont(string data)
@@ -77,7 +67,6 @@ namespace SpriteFontPlus
 			var bmFont = new BitmapFont();
 			if (data.StartsWith("<"))
 			{
-				// xml
 				bmFont.LoadXml(data);
 			}
 			else
@@ -88,11 +77,11 @@ namespace SpriteFontPlus
 			return bmFont;
 		}
 
-		public static SpriteFont Load(string data, Func<string, TextureWithOffset> textureGetter)
+		public static SpriteFont Load(string data, Texture2D texture)
 		{
 			var bmFont = LoadBMFont(data);
 
-			return Load(bmFont, textureGetter);
+			return Load(bmFont, texture);
 		}
 
 		public unsafe static SpriteFont Load(string data, Func<string, Stream> imageStreamOpener, GraphicsDevice device)
@@ -140,8 +129,7 @@ namespace SpriteFontPlus
 					stream.Dispose();
 				}
 			}
-
-			return Load(bmFont, fileName => new TextureWithOffset(textures[fileName]));
+			return Load(bmFont, textures.First().Value);
 		}
 	}
 }
