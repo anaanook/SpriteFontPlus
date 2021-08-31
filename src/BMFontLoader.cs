@@ -54,8 +54,8 @@ namespace SpriteFontPlus
 				cropping.Add(new Rectangle(character.XOffset, character.YOffset, bounds.Width, bounds.Height));
                 
 				chars.Add(character.Char);
-                
-				kerning.Add(new Vector3(0, character.Width, character.XAdvance - character.Width));
+				kerning.Add(new Vector3(0, character.Width, 1));
+				//kerning.Add(new Vector3(0, character.Width, character.XAdvance - character.Width));
 			}
             
 			return new SpriteFont(texture,glyphBounds,cropping,chars,data.LineHeight,0,kerning,' ');
